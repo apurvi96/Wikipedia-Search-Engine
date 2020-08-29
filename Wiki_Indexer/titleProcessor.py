@@ -5,11 +5,12 @@
 
 
 import nltk
-nltk.download('stopwords')
+nltk.download('stopwords',quiet=True)
 from nltk.corpus import stopwords 
 from nltk.stem.porter import *
 import sys
-from nltk.stem.snowball import SnowballStemmer
+# from nltk.stem.snowball import SnowballStemmer
+import Stemmer 
 from collections import defaultdict
 
 
@@ -23,9 +24,10 @@ class TitleProcessor():
         data=self.remove_Regx(data)
         data=self.tokenizer(data)
         data=self.case_fold(data)
+        prev_size=len(data)
         data=self.removeStopwords(data)
         data=self.doStemming(data)
-        return data
+        return data,prev_size
         
 #     def camelCase(self,data):
 #         return re.findall(r'[A-Z](?:[a-z]+|[A-Z]*(?=[A-Z]|$))',data)
@@ -45,10 +47,11 @@ class TitleProcessor():
         return removedStopW
     
     def doStemming(self,data):
-        stemmer=SnowballStemmer("english")
+#         stemmer=SnowballStemmer("english")
+        stemmer=Stemmer.Stemmer('english')
         stemmed_data=[]
         for words in data:
-            stemmed_data.append(stemmer.stem(words))
+            stemmed_data.append(stemmer.stemWord(words))
         return stemmed_data
     
     def remove_Regx(self,data):

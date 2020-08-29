@@ -1,6 +1,12 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+# In[ ]:
+
+
+
+
+
 # In[1]:
 
 
@@ -24,6 +30,8 @@ Doc_ID=1 #to maintain total Number of pages in the dump
 Doc_IDtoTitle={} # a map to maintain name of doc ids
 globalDictionary={} #final invertedIndex dictionary for each batch
 invertedIndexFile=1 #maintainsFile number
+totalDumpTokens=0
+invertedIndexTokens=0
 
 
 # In[3]:
@@ -43,8 +51,9 @@ def getGlobalDictionary(pageDictionary):
 
 def writeToFile():
     global globalDictionary,invertedIndexFile,Doc_ID
-    outputPath="./output"
-    filePath=outputPath+"/indexfile"+str(invertedIndexFile)+".txt"
+#     filePath="indexfile"+str(invertedIndexFile)+".txt"
+    folderPath=sys.argv[2]
+    filePath=folderPath+"indexfile"+str(invertedIndexFile)+".txt"
     invertedIndexFile+=1
     with open(filePath, "a") as outfile:
         for word in sorted(globalDictionary):
@@ -63,6 +72,7 @@ def writeToFile():
                 invStr+="|"        
             invStr=invStr[:-1]
 #             print("final invStr",invStr)
+#             print(invStr)
             outfile.write(invStr + '\n')        
     outfile.close()        
 
@@ -78,6 +88,21 @@ def checkWords(word):
 
 
 # In[5]:
+
+
+def writeStatFile():
+    global globalDictionary,totalDumpTokens
+    filePath=sys.argv[3]
+#     filePath="stat.txt"
+    with open(filePath, "w") as outfile:
+#         print("final totalDumpTokens ",totalDumpTokens)
+        outfile.write(str(totalDumpTokens)+ '\n')
+#         print("final global ",len(globalDictionary))
+        outfile.write(str(len(globalDictionary)))
+    outfile.close()
+
+
+# In[6]:
 
 
 #content Handler code for XML parser
@@ -109,12 +134,13 @@ class parseXML(xml.sax.ContentHandler):
     def endElement(self,tag):
         if tag=='page':
             global Doc_ID,globalDictionary,Doc_IDtoTitle
-            print("----------------------end doc",Doc_ID,"----------------------------")
+#             print("----------------------end doc",Doc_ID,"----------------------------")
             if Doc_ID%50000==0:
+#             if Doc_ID==10:
                 writeToFile()
                 globalDictionary.clear()
                 Doc_IDtoTitle.clear()
-            
+#                 sys.exit()
            
             Doc_ID+=1
         
@@ -124,10 +150,10 @@ class parseXML(xml.sax.ContentHandler):
             storeValue(Doc_ID,self.title_content,Doc_IDtoTitle) 
         
         elif tag=='text':
+            global totalDumpTokens
             #process title
             pr=TitleProcessor()
-            processedTitle=pr.processData(self.title_content)
-#             print("Processed title : ",processedTitle)
+            processedTitle,prevTitle=pr.processData(self.title_content)
             
             #get fields from text_content
             pt=TextFieldProcessor()
@@ -136,20 +162,18 @@ class parseXML(xml.sax.ContentHandler):
             #make dictionary for each field
             titleDict=pr.getTitleDictionary(processedTitle)
             page=PageProcessor()
-            infoDict=page.getAllDictionary(info)
+            infoDict,prevInfo=page.getAllDictionary(info)
 #             print("---------info---------")
-            bodyDict=page.getAllDictionary(bodyText)
+            bodyDict,prevBody=page.getAllDictionary(bodyText)
 #             print("---------bodyDict---------")
-            categoryDict=page.getAllDictionary(category)
+            categoryDict,prevCat=page.getAllDictionary(category)
 #             print("---------catDict---------")
-            externalLinksDict=page.getAllDictionary(externalLinks)
+            externalLinksDict,prevLinks=page.getAllDictionary(externalLinks)
 #             print("---------exlDict---------")
 #             print(referencesDict)
-            referencesDict=page.getAllDictionary(references)
-#             print("---------refDict---------")
+            referencesDict,prevRef=page.getAllDictionary(references)
             
-#             print(externalLinksDict)
-            
+            totalDumpTokens+=(prevTitle+prevLinks+prevCat+prevBody+prevInfo+prevTitle)
             #make final page Dictionary for each page
             pageDictionary=page.getPageDictionary(titleDict,infoDict,bodyDict,categoryDict,externalLinksDict,referencesDict)
 #             print("page dictionary ",pageDictionary)
@@ -157,14 +181,16 @@ class parseXML(xml.sax.ContentHandler):
         self.current_tag=""
 
 
-# In[ ]:
+# In[7]:
 
 
 if __name__=="__main__":
-    global globalDictionary
-    Wiki_input_file="./Data/input.bz2"
-    source = bz2.BZ2File(Wiki_input_file, "rb")
+    source=sys.argv[1]
+#     Wiki_input_file="./Data/input.bz2"
+#     source = bz2.BZ2File(Wiki_input_file, "rb")
+#     source="/home/apurvi/Desktop/SEM-3/IRE/Mini Project/Wikipedia Search Engine/multistream2.xml-p1p30303"
     start = timeit.default_timer()
+    
     #Create a parser Object
     parser= xml.sax.make_parser()
     
@@ -180,6 +206,8 @@ if __name__=="__main__":
     
     if bool(globalDictionary):
         writeToFile()
+    writeStatFile()
+    
     stop = timeit.default_timer()
     print('Time: ', stop - start)
     print('-----------------------------')

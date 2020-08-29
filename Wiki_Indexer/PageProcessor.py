@@ -7,12 +7,12 @@
 #import Files 
 import xml.sax
 import nltk
-nltk.download('stopwords')
 from nltk.corpus import stopwords 
 import bz2
 from nltk.stem.porter import *
 import sys
-from nltk.stem.snowball import SnowballStemmer
+# from nltk.stem.snowball import SnowballStemmer
+import Stemmer
 from collections import defaultdict
 from titleProcessor import TitleProcessor
 from TextParser import TextFieldProcessor
@@ -38,16 +38,18 @@ class PageProcessor():
         return removedStopW
     
     def doStemming(self,data):
-        stemmer=SnowballStemmer("english")
+#         stemmer=SnowballStemmer("english")
+        stemmer=Stemmer.Stemmer('english')
         stemmed_data=[]
         for words in data:
-            stemmed_data.append(stemmer.stem(words))
+            stemmed_data.append(stemmer.stemWord(words))
         return stemmed_data
     
     def makeDictionary(self,word_list):
         Dict=defaultdict(int)
         for word in word_list:
-            if word.isdecimal() or len(word)==1:
+#             if word.isdecimal() or len(word)==1:
+            if len(word)==1:  
                 continue
             else:
                 Dict[word]+=1
@@ -56,10 +58,12 @@ class PageProcessor():
     def getAllDictionary(self,word_list):
 #         print("word_list",type(word_list[0]))
         word_list=self.tokenizer(' '.join(word_list))
+        prev_val=len(word_list)
         word_list=self.removeStopwords(word_list)
         word_list=self.doStemming(word_list)
         Dict=self.makeDictionary(word_list)
-        return Dict
+#         print("after ",len(Dict))
+        return Dict,prev_val
     
     def mergeDict(self,Dict,typeIndex):
 #         print("typeIndex",typeIndex,"------------------")
