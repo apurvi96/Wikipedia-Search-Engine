@@ -1,6 +1,6 @@
 ### Wikipedia-Search-Engine
 A search engine query over wikipedia data dump of size ~60 GB.
-Using inverted Indexing, merging and Ranking Techiniques.
+Using inverted Indexing, merging and Ranking Techniques.
 
 ### Features
 - Support for Field Queries - Fields include Title, Infobox, Body, Category, Links, and References. This helps when a user is interested in searching for the movie ‘Up’ where he would like to see the page containing the word ‘Up’ in the title and the word ‘Pixar’ in the Infobox
