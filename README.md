@@ -2,7 +2,7 @@
 A search engine query over wikipedia data dump of size ~60 GB.
 Using inverted Indexing, merging and Ranking Techiniques.
 
-###Features
+### Features
 - Support for Field Queries - Fields include Title, Infobox, Body, Category, Links, and References. This helps when a user is interested in searching for the movie ‘Up’ where he would like to see the page containing the word ‘Up’ in the title and the word ‘Pixar’ in the Infobox
 - Index size should be less than one-fourth of the dump size
 
@@ -13,11 +13,12 @@ Total number of tokens (after converting to lowercase) encountered in the dump
 Total number of tokens in the inverted index
 
 2. bash search.sh  <path_to_invertedindex_output> query_string
-Plain query_string examples
+
+#### Plain query_string examples
 Sachin Ramesh Tendulkar
 Hogwarts
 
-Field query_string examples
+#### Field query_string examples
 t:World Cup i:2019 c:Cricket
 search for "World Cup" in Title, "2019" in Infobox and "Sports" in Category
 
