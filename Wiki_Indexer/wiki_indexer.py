@@ -82,7 +82,7 @@ def writeToFile():
 
 def checkWords(word):
     ignoreWords=['redirect','redirect2']
-    if len(word)<=2 or word in ignoreWords or re.match('^[0]+$',word) or not(re.match('^[a-zA-Z0-9]+$',word)):
+    if len(word)<=2 or word in ignoreWords or re.match('^[0]+$',word) or not(re.match('^[a-zA-Z0-9]+$',word)) or (word.isdecimal() and len(word)>4):
         return True
     return False
 

@@ -85,7 +85,7 @@ if __name__=="__main__":
 #     query1="shell seattle 1864"
 #     query="t:Anarch AccessibleComputing swqwe Shell b:1864 17"
     query=' '.join(sys.argv[2:])
-    createDictionary(indexPath)
+    createDictionary(indexPath+"indexfile1.txt")
     queryType="plain"
     if ":" in query:
         queryType="field"
